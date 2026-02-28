@@ -104,10 +104,31 @@ function spawnEnemy(type) {
 function loadIfPossible() {
   const data = loadGame();
   if (!data) return;
-  Object.assign(state.player, data.player || {});
-  state.quest = data.quest || state.quest;
+  const safePlayer = data.player || {};
+  Object.assign(state.player, {
+    x: safePlayer.x ?? state.player.x,
+    y: safePlayer.y ?? state.player.y,
+    hp: clamp(safePlayer.hp ?? state.player.hp, 1, state.player.maxHp),
+    maxHp: safePlayer.maxHp ?? state.player.maxHp,
+    mana: clamp(safePlayer.mana ?? state.player.mana, 0, state.player.maxMana),
+    maxMana: safePlayer.maxMana ?? state.player.maxMana,
+    gold: Math.max(0, safePlayer.gold ?? state.player.gold),
+    weapon: ['melee', 'ranged', 'magic'].includes(safePlayer.weapon) ? safePlayer.weapon : state.player.weapon,
+    inventory: {
+      potion: Math.max(0, safePlayer.inventory?.potion ?? state.player.inventory.potion),
+      herb: Math.max(0, safePlayer.inventory?.herb ?? state.player.inventory.herb),
+      letter: Boolean(safePlayer.inventory?.letter),
+    },
+    attackCd: 0,
+    invuln: 0,
+  });
+
+  if (data.quest?.byId && data.quest?.order) state.quest = data.quest;
   state.herbNodes = (data.world?.herbNodes || state.herbNodes).map((h) => ({ ...h, collected: false }));
   state.enemies = data.world?.enemies?.length ? data.world.enemies : state.enemies;
+
+  refreshQuestUnlocks();
+  syncHerbQuestProgress();
   ui.addLog('Save carregado com sucesso.');
 }
 
@@ -161,7 +182,7 @@ function update(dt) {
     if (!herb.collected && distance(p, herb) < p.r + herb.r + 6) {
       herb.collected = true;
       p.inventory.herb += 1;
-      progressQuest('Q2', 1);
+      syncHerbQuestProgress();
       ui.addLog('Você coletou uma erva.');
     }
   }
@@ -276,9 +297,32 @@ function progressQuest(id, amount) {
   if (q.progress >= q.goal) {
     q.complete = true;
     ui.addLog(`Quest concluída: ${q.name}`);
-    if (id === 'Q1') state.quest.byId.Q2.started = true;
+    if (id === 'Q1') {
+      state.quest.byId.Q2.started = true;
+      syncHerbQuestProgress();
+    }
     if (id === 'Q2') state.quest.byId.Q3.started = true;
   }
+}
+
+function syncHerbQuestProgress() {
+  const q2 = state.quest.byId.Q2;
+  if (!q2 || !q2.started || q2.complete) return;
+
+  const target = clamp(state.player.inventory.herb, 0, q2.goal);
+  if (target > q2.progress) {
+    q2.progress = target;
+    if (q2.progress >= q2.goal) {
+      q2.complete = true;
+      ui.addLog(`Quest concluída: ${q2.name}`);
+      state.quest.byId.Q3.started = true;
+    }
+  }
+}
+
+function refreshQuestUnlocks() {
+  if (state.quest.byId.Q1?.complete) state.quest.byId.Q2.started = true;
+  if (state.quest.byId.Q2?.complete) state.quest.byId.Q3.started = true;
 }
 
 function interactNPC() {
