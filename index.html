@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>RPG 2D Top-Down</title>
+  <style>
+    :root { color-scheme: dark; }
+    html, body { margin: 0; padding: 0; background: #0f1115; font-family: Arial, sans-serif; }
+    #wrap { display: grid; place-items: center; min-height: 100vh; }
+    canvas { border: 1px solid #222a33; background: #1d3a1f; image-rendering: pixelated; }
+    #saveBtn {
+      position: fixed; top: 10px; left: 10px; z-index: 2;
+      border: 1px solid #2e475a; background: #1a2430; color: #d3e8ff;
+      padding: 6px 10px; border-radius: 6px; cursor: pointer;
+    }
+    #saveBtn:hover { background: #213041; }
+  </style>
+</head>
+<body>
+  <button id="saveBtn">Salvar</button>
+  <div id="wrap"><canvas id="game" width="960" height="640"></canvas></div>
+  <script type="module" src="./src/game.js"></script>
+</body>
+</html>
