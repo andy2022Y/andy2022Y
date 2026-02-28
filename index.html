@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RPG Top-Down</title>
+  <style>
+    :root { color-scheme: dark; }
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #1a1f16;
+      color: #e7f3db;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 12px;
+      gap: 12px;
+    }
+    #leftPanel { position: relative; }
+    canvas {
+      border: 2px solid #445933;
+      background: #2c5c2f;
+      image-rendering: pixelated;
+    }
+    #ui {
+      width: 300px;
+      background: #21321f;
+      border: 1px solid #587249;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    .row { margin-bottom: 8px; }
+    button {
+      background: #3f5a33;
+      color: #eff8e7;
+      border: 1px solid #6f9658;
+      padding: 6px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 4px;
+    }
+    #shop {
+      margin-top: 10px;
+      display: none;
+      border-top: 1px dashed #628a54;
+      padding-top: 10px;
+    }
+    #minimap { margin-top: 8px; }
+    .hint { color: #b4cb9f; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <div id="leftPanel">
+    <canvas id="game" width="960" height="640"></canvas>
+  </div>
+
+  <aside id="ui">
+    <div class="row" id="stats"></div>
+    <div class="row" id="weapon"></div>
+    <div class="row" id="quests"></div>
+    <div class="row" id="log"></div>
+    <div class="row">
+      <button id="usePotion">Usar Poção (P)</button>
+      <button id="manualSave">Salvar Manual</button>
+    </div>
+    <div class="hint">
+      WASD/Setas: mover (8 direções) • 1/2/3: melee/ranged/magic • Clique: atacar • E: interagir
+    </div>
+    <div id="shop">
+      <strong>Loja</strong>
+      <p>Poção de vida: 10 gold</p>
+      <button id="buyPotion">Comprar poção</button>
+      <button id="closeShop">Fechar</button>
+    </div>
+    <canvas id="minimap" width="280" height="180"></canvas>
+  </aside>
+
+  <script type="module" src="./src/game.js"></script>
+</body>
+</html>
